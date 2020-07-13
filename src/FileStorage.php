@@ -37,9 +37,15 @@ class FileStorage implements StorageInterface {
 
 
 
+    private static function hashKey(string $key): string {
+        return md5($key);
+    }
+
+
+
     function containsKey(string $key): bool {
         try {
-            $this->find($key);
+            $this->findContainer($key);
 
             return true;
         }
@@ -68,9 +74,9 @@ class FileStorage implements StorageInterface {
      * @return string
      * @throws NotFoundException
      */
-    private function find(string $key): string {
-        $prefix    = md5($key);
-        $fullPaths = glob($this->path . "/{$prefix}_*.value");
+    private function findContainer(string $key): string {
+        $keyHash   = self::hashKey($key);
+        $fullPaths = glob($this->path . "/{$keyHash}_*.value");
         if (empty($fullPaths))
             throw new NotFoundException("Container for key '{$key}' not found");
         if (count($fullPaths) > 1)
@@ -82,12 +88,12 @@ class FileStorage implements StorageInterface {
 
 
     function isValid(string $key): bool {
-        $now  = time();
-        $file = $this->find($key);
+        $now       = time();
+        $container = $this->findContainer($key);
 
-        if (preg_match_all(self::RX_FILENAME, $file) === 1)
+        if (preg_match_all(self::RX_FILENAME, $container) === 1)
             return true;
-        if (preg_match_all(self::RX_EXPIRING_FILENAME_HASH, $file, $matches) === 1) {
+        if (preg_match_all(self::RX_EXPIRING_FILENAME_HASH, $container, $matches) === 1) {
             $expiresAt = intval($matches['et'][0]);
 
             return $expiresAt > $now;
@@ -99,13 +105,13 @@ class FileStorage implements StorageInterface {
 
 
     private function makeExpiringFileName(string $key, int $expiresAt): string {
-        return $this->makeFullName(sprintf("%s_%d.value", md5($key), $expiresAt));
+        return $this->makeFullName(sprintf("%s_%d.value", self::hashKey($key), $expiresAt));
     }
 
 
 
     private function makeFileName(string $key): string {
-        return $this->makeFullName(md5($key) . '_.value');
+        return $this->makeFullName(self::hashKey($key) . '_.value');
     }
 
 
@@ -122,14 +128,14 @@ class FileStorage implements StorageInterface {
         if (!$this->isValid($key))
             throw new ValueExpiredException("Value for key '{$key}' is expired");
 
-        return file_get_contents($this->makeFullName($this->find($key)));
+        return file_get_contents($this->makeFullName($this->findContainer($key)));
     }
 
 
 
     function remove(string $key) {
         try {
-            unlink($this->makeFullName($this->find($key)));
+            unlink($this->makeFullName($this->findContainer($key)));
         }
         catch (NotFoundException $ignored) {
             // do nothing
