@@ -1,0 +1,31 @@
+{
+  "name":         "daiser/thecache",
+  "description":  "Super-duper minimalistic cache",
+  "authors":      [
+    {
+      "name":     "Roman Kvitkov",
+      "email":    "rk@316.su",
+      "homepage": "http://316.su",
+      "role":     "Developer"
+    }
+  ],
+  "support":      {
+    "email": "rk@316.su"
+  },
+  "require":      {
+    "php": "^7.1"
+  },
+  "autoload":     {
+    "psr-4": {
+      "MaximalTestWork\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "MaximalTestWork\\Tests\\": "tests/"
+    }
+  },
+  "require-dev":  {
+    "phpunit/phpunit": "^8.5"
+  }
+}
