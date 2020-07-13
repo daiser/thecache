@@ -14,7 +14,6 @@ class CacheTest extends TestCase {
 
     protected function setUp(): void {
         $this->path = (sys_get_temp_dir() ?? '.') . '/the-cache-ut';
-        $this->path = (sys_get_temp_dir() ?? '.') . '/the-cache-ut';
         mkdir($this->path);
     }
 
