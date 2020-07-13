@@ -12,7 +12,7 @@ class FileStorageTest extends AbstractStorageTest {
 
 
     protected function setUp(): void {
-        $this->path = (sys_get_temp_dir() ?? '.') . '/the-cache-ut';
+        $this->path = (sys_get_temp_dir() ?? '.') . '/the-cache-fs-ut';
         mkdir($this->path);
         $this->storage = new FileStorage($this->path);
     }

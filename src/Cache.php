@@ -13,6 +13,12 @@ class Cache implements CacheInterface {
 
 
 
+    function __construct(StorageInterface $storage = null) {
+        $this->storage = $storage ?? new MemoryStorage();
+    }
+
+
+
     function contains(string $key): bool {
         return $this->storage->containsKey($key);
     }
