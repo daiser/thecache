@@ -25,8 +25,8 @@ use MaximalTestWork\Contracts\StorageInterface;
  */
 
 class FileStorage implements StorageInterface {
-    private const RX_EXPIRING_FILENAME_HASH = '/^(?<keyhash>[0-9a-f]{32})_(?<et>\d+)\.value$/';
-    private const RX_FILENAME               = '/^(?<keyhash>[0-9a-f]{32})_\.value$/';
+    private const RX_EXPIRING_FILENAME = '/^(?<keyhash>[0-9a-f]{32})_(?<et>\d+)\.value$/';
+    private const RX_FILENAME          = '/^(?<keyhash>[0-9a-f]{32})_\.value$/';
     private $path;
 
 
@@ -76,7 +76,7 @@ class FileStorage implements StorageInterface {
      */
     private function findContainer(string $key): string {
         $keyHash   = self::hashKey($key);
-        $fullPaths = glob($this->path . "/{$keyHash}_*.value");
+        $fullPaths = glob($this->makeFullName("{$keyHash}_*.value"));
         if (empty($fullPaths))
             throw new NotFoundException("Container for key '{$key}' not found");
         if (count($fullPaths) > 1)
@@ -93,7 +93,7 @@ class FileStorage implements StorageInterface {
 
         if (preg_match_all(self::RX_FILENAME, $container) === 1)
             return true;
-        if (preg_match_all(self::RX_EXPIRING_FILENAME_HASH, $container, $matches) === 1) {
+        if (preg_match_all(self::RX_EXPIRING_FILENAME, $container, $matches) === 1) {
             $expiresAt = intval($matches['et'][0]);
 
             return $expiresAt > $now;
